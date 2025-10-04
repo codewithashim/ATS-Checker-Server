@@ -128,7 +128,6 @@ Thumbs.db
 dev.sh
 setup.sh
 *.md
-README.md
 
 # Logs
 logs/
