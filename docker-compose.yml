@@ -1,0 +1,61 @@
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - DEBUG=${DEBUG:-True}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - WATCHFILES_FORCE_POLLING=true
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app --reload-include "*.py" --log-level debug
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+  queue-worker:
+    build: .
+    command: python -m app.modules.shared.workers.worker_manager
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - PYTHONPATH=/app
+      - PYTHONUNBUFFERED=1
+      - DEBUG=${DEBUG:-True}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+    depends_on:
+      - redis
+    volumes:
+      - .:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+
+volumes:
+  redis_data:
