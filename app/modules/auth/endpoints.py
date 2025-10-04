@@ -20,6 +20,7 @@ from app.modules.auth.schemas import (
     User,
     UserLogin,
     Token,
+    TokenWithUser,
     PasswordReset,
     PasswordResetConfirm,
     EmailVerification,
@@ -69,7 +70,7 @@ async def authenticate_user(email: str, password: str) -> UserModel | None:
         return None
     return user
 
-@router.post("/signup", response_model=Token)
+@router.post("/signup", response_model=TokenWithUser)
 async def signup(user_data: UserCreate):
     """Register a new user"""
     # Check if user already exists
@@ -108,10 +109,17 @@ async def signup(user_data: UserCreate):
         "access_token": access_token,
         "refresh_token": refresh_token,
         "token_type": "bearer",
-        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        "user_id": str(db_user.id),
+        "name": db_user.name,
+        "email": db_user.email,
+        "role": db_user.role,
+        "is_email_verified": db_user.is_email_verified,
+        "created_at": db_user.created_at,
+        "updated_at": db_user.updated_at
     }
 
-@router.post("/login", response_model=Token)
+@router.post("/login", response_model=TokenWithUser)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """Login user"""
     user = await authenticate_user(form_data.username, form_data.password)
@@ -145,7 +153,14 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
         "access_token": access_token,
         "refresh_token": refresh_token,
         "token_type": "bearer",
-        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        "user_id": str(user.id),
+        "name": user.name,
+        "email": user.email,
+        "role": user.role,
+        "is_email_verified": user.is_email_verified,
+        "created_at": user.created_at,
+        "updated_at": user.updated_at
     }
 
 @router.post("/refresh", response_model=Token)

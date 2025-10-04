@@ -46,6 +46,15 @@ class Token(BaseModel):
     token_type: str = "bearer"
     expires_in: int
 
+class TokenWithUser(Token):
+    user_id: str
+    name: str
+    email: str
+    role: str
+    is_email_verified: bool
+    created_at: datetime
+    updated_at: datetime
+
 class TokenData(BaseModel):
     user_id: Optional[str] = None
     email: Optional[str] = None
