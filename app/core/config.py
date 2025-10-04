@@ -3,13 +3,13 @@ from typing import List
 
 class Settings(BaseSettings):
     # Database
-    MONGODB_URL: str = "mongodb+srv://ats_checker:ats_checker@atschecker.oyggojv.mongodb.net/?retryWrites=true&w=majority&appName=ATSChecker"
+    MONGODB_URL: str = ""  # Set via environment variable
     
     # Redis
     REDIS_URL: str = "redis://localhost:6379"
     
     # Security
-    SECRET_KEY: str = "your-secret-key-change-in-production"
+    SECRET_KEY: str = ""  # Set via environment variable
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
@@ -17,8 +17,8 @@ class Settings(BaseSettings):
     # Email Configuration
     EMAIL_HOST: str = "smtp.gmail.com"
     EMAIL_PORT: int = 587
-    EMAIL_USERNAME: str = ""
-    EMAIL_PASSWORD: str = ""
+    EMAIL_USERNAME: str = ""  # Set via environment variable
+    EMAIL_PASSWORD: str = ""  # Set via environment variable
     EMAIL_USE_TLS: bool = True
     
     # Frontend URL
@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     
     # AI Configuration
-    GEMINI_API_KEY: str = ""
+    GEMINI_API_KEY: str = ""  # Set via environment variable
     GEMINI_MODEL: str = "gemini-2.5-flash"
     
     # CORS
